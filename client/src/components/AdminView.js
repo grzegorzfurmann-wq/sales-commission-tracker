@@ -18,9 +18,10 @@ function AdminView({ formatCurrency, adminEmail }) {
 
   const fetchData = async () => {
     try {
+      const apiUrl = process.env.REACT_APP_API_URL || '';
       const [salespeopleRes, contractsRes] = await Promise.all([
-        fetch('/api/salespeople'),
-        fetch('/api/contracts')
+        fetch(`${apiUrl}/api/salespeople`),
+        fetch(`${apiUrl}/api/contracts`)
       ]);
       
       const salespeopleData = await salespeopleRes.json();

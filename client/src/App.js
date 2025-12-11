@@ -29,7 +29,8 @@ function App() {
 
   const fetchSalespeople = async () => {
     try {
-      const response = await fetch('/api/salespeople');
+      const apiUrl = process.env.REACT_APP_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/salespeople`);
       const data = await response.json();
       setSalespeople(data);
       setLoading(false);

@@ -26,7 +26,8 @@ function SetPassword() {
     }
 
     // Weryfikuj token
-    fetch(`/api/set-password/${token}`)
+    const apiUrl = process.env.REACT_APP_API_URL || '';
+    fetch(`${apiUrl}/api/set-password/${token}`)
       .then(res => {
         if (!res.ok) {
           throw new Error('Błąd połączenia z serwerem');
@@ -72,7 +73,8 @@ function SetPassword() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/set-password', {
+      const apiUrl = process.env.REACT_APP_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/set-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

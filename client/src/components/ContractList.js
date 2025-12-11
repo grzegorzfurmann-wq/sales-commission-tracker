@@ -17,7 +17,8 @@ function ContractList({ contracts, formatCurrency, onContractUpdated }) {
 
   const handleStatusChange = async (contractId, newStatus) => {
     try {
-      const response = await fetch(`/api/contracts/${contractId}`, {
+      const apiUrl = process.env.REACT_APP_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/contracts/${contractId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

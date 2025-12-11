@@ -23,7 +23,8 @@ function AddContractForm({ salespersonId, salespeople, onContractAdded }) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/contracts', {
+      const apiUrl = process.env.REACT_APP_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/contracts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

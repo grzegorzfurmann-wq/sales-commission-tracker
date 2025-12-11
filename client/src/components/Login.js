@@ -19,7 +19,8 @@ function Login({ salespeople, onLogin }) {
     }
 
     try {
-      const response = await fetch('/api/login', {
+      const apiUrl = process.env.REACT_APP_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

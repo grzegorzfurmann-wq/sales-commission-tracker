@@ -17,9 +17,10 @@ function SalespersonView({ salesperson, formatCurrency }) {
 
   const fetchData = async () => {
     try {
+      const apiUrl = process.env.REACT_APP_API_URL || '';
       const [contractsRes, statsRes] = await Promise.all([
-        fetch(`/api/salespeople/${salesperson.id}/contracts`),
-        fetch(`/api/salespeople/${salesperson.id}/commission`)
+        fetch(`${apiUrl}/api/salespeople/${salesperson.id}/contracts`),
+        fetch(`${apiUrl}/api/salespeople/${salesperson.id}/commission`)
       ]);
       
       const contractsData = await contractsRes.json();

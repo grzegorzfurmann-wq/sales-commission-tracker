@@ -8,7 +8,8 @@ function ContractNotes({ contract, salespersonId, onSave, onCancel }) {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch(`/api/contracts/${contract.id}/notes`, {
+      const apiUrl = process.env.REACT_APP_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/contracts/${contract.id}/notes`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

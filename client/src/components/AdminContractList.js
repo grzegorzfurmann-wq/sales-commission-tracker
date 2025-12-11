@@ -31,7 +31,8 @@ function AdminContractList({ contracts, formatCurrency, onContractUpdated }) {
 
   const handleStatusChange = async (contractId, newStatus) => {
     try {
-      const response = await fetch(`/api/contracts/${contractId}/status`, {
+      const apiUrl = process.env.REACT_APP_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/contracts/${contractId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -90,7 +91,8 @@ function AdminContractList({ contracts, formatCurrency, onContractUpdated }) {
 
   const deleteContract = async (contractId) => {
     try {
-      const response = await fetch(`/api/contracts/${contractId}`, {
+      const apiUrl = process.env.REACT_APP_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/contracts/${contractId}`, {
         method: 'DELETE',
       });
 

@@ -89,7 +89,8 @@ function SalespeopleManagement({ salespeople, onSalespersonAdded, onSalespersonU
     }
 
     try {
-      const response = await fetch(`/api/salespeople/${id}`, {
+      const apiUrl = process.env.REACT_APP_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/salespeople/${id}`, {
         method: 'DELETE',
       });
 
