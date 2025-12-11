@@ -1,0 +1,25 @@
+.admin-view {
+  padding: 2rem;
+}
+
+.admin-header {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.admin-header h2 {
+  color: #333;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.admin-header p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+
+

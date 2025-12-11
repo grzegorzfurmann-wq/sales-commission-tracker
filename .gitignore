@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Database
+server/database.sqlite
+server/database.sqlite-journal
+
+# Production
+client/build/
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+
+
+# Local Netlify folder
+.netlify
+

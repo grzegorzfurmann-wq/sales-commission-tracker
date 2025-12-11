@@ -1,0 +1,27 @@
+{
+  "short_name": "Prowizje",
+  "name": "System Prowizji Handlowców",
+  "description": "Aplikacja do śledzenia umów i prowizji dla handlowców",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#667eea",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary"
+}
+
+
+

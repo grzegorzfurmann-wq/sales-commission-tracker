@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator Fotowoltaiki z Magazynem Energii</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      background: #f5f6fa;
+      color: #2c3e50;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+      font-size: 2.2em;
+    }
+
+    .header .note {
+      color: #7f8c8d;
+      font-style: italic;
+      font-size: 0.9em;
+    }
+
+    .input-section {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    .input-section h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .input-group label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #34495e;
+      font-size: 0.95em;
+    }
+
+    .input-group input,
+    .input-group select {
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 1em;
+      transition: border-color 0.3s;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+
+    .button-container {
+      margin-top: 25px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .calculate-button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.1em;
+      font-weight: 600;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .calculate-button:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .calculate-button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .results-section {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    .results-section h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9em;
+      min-width: 1200px;
+    }
+
+    thead {
+      background: #34495e;
+      color: white;
+    }
+
+    th {
+      padding: 12px 8px;
+      text-align: left;
+      font-weight: 600;
+      white-space: nowrap;
+      font-size: 0.85em;
+    }
+
+    td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    tbody tr:hover {
+      background: #f5f5f5;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    tbody tr:nth-child(even):hover {
+      background: #f0f0f0;
+    }
+
+    .positive {
+      color: #27ae60;
+      font-weight: 600;
+    }
+
+    .negative {
+      color: #e74c3c;
+      font-weight: 600;
+    }
+
+    .summary-section {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .summary-section h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .summary-grid-main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card-main {
+      background: #f8f9fa;
+      padding: 30px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .summary-card-main.positive {
+      background: #d4edda;
+      border: 2px solid #27ae60;
+    }
+
+    .summary-card-main.negative {
+      background: #f8d7da;
+      border: 2px solid #e74c3c;
+    }
+
+    .summary-card-main:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .summary-card-main h3 {
+      color: #34495e;
+      margin-bottom: 10px;
+      font-size: 1.2em;
+      font-weight: 600;
+    }
+
+    .summary-card-main .label {
+      font-size: 1em;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #34495e;
+    }
+
+    .summary-card-main.positive .label {
+      color: #27ae60;
+    }
+
+    .summary-card-main.negative .label {
+      color: #e74c3c;
+    }
+
+    .summary-card-main p {
+      margin: 0;
+      font-size: 1.5em;
+    }
+
+    .summary-card-main p.large {
+      font-size: 2em;
+      font-weight: 700;
+    }
+
+    .summary-card {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .summary-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .summary-card h3 {
+      color: #34495e;
+      margin-bottom: 10px;
+      font-size: 1em;
+      font-weight: 600;
+    }
+
+    .summary-card p {
+      margin: 0;
+      font-size: 1.2em;
+    }
+
+    .summary-card p.large {
+      font-size: 1.5em;
+      font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .input-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-grid-main {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 0.8em;
+      }
+
+      th, td {
+        padding: 8px 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>☀️ Kalkulator Fotowoltaiki z Magazynem Energii w Bilansowaniu ENIGA</h1>
+      <p class="note">*nie uwzględnia niższych cen RB - więc wylicza bardziej negatywny scenariusz</p>
+    </div>
+
+    <div class="input-section">
+      <h2>Dane wejściowe</h2>
+      <div class="input-grid">
+        <div class="input-group">
+          <label>Rodzaj ogrzewania:</label>
+          <select id="heatingType">
+            <option value="bez PC">bez PC</option>
+            <option value="z PC">z PC</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Zużycie [kWh]:</label>
+          <input type="number" id="consumption" value="5000" placeholder="wpisz zużycie">
+        </div>
+
+        <div class="input-group">
+          <label>Moc PV [kWp]:</label>
+          <input type="number" id="pvPower" value="5" placeholder="wpisz proponowaną moc PV">
+        </div>
+
+        <div class="input-group">
+          <label>Kierunek dachu:</label>
+          <select id="roofDirection">
+            <option value="południe">południe</option>
+            <option value="wschód-zachód">wschód-zachód</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Produkcja [kWh]:</label>
+          <input type="number" id="production" value="5250" readonly style="background-color: #f0f0f0;">
+          <small style="color: #7f8c8d; font-size: 0.85em;">Obliczana automatycznie z mocy PV i kierunku dachu</small>
+        </div>
+
+        <div class="input-group">
+          <label>ME [kWh] (pojemność magazynu):</label>
+          <input type="number" id="meCapacity" value="5" placeholder="wpisz proponowaną pojemność ME (min. x4 zużycia)">
+        </div>
+      </div>
+      <div class="button-container">
+        <button id="calculateBtn" class="calculate-button">Przelicz</button>
+      </div>
+    </div>
+
+    <div class="summary-section">
+      <h2>Podsumowanie roczne</h2>
+      <div class="summary-grid-main" id="summaryGridMain">
+      </div>
+      <div class="summary-grid" id="summaryGrid">
+      </div>
+    </div>
+
+    <div class="results-section">
+      <h2>Wyniki miesięczne</h2>
+      <div class="table-container">
+        <table id="resultsTable">
+          <thead>
+            <tr>
+              <th>Miesiąc</th>
+              <th>Dni</th>
+              <th>Produkcja miesięczna [kWh]</th>
+              <th>Produkcja dzienna [kWh]</th>
+              <th>Zużycie miesięczne [kWh]</th>
+              <th>Średnie zużycie dzienne [kWh]</th>
+              <th>Saldo energii [kWh]</th>
+              <th>Dzienna nadwyżka [kWh]</th>
+              <th>Dzienny brak [kWh]</th>
+              <th>Wartość depozytu [zł]</th>
+              <th>Wartość zakupu [zł]</th>
+              <th>Koszty dystrybucji [zł]</th>
+              <th>Wartość netto [zł]</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dane historyczne cen energii (PLN/MWh)
+    // consumptionSharePC - udział zużycia dla opcji "z PC" (z kolumny I w Excelu)
+    const priceData = [
+      { month: 'Styczeń', days: 31, cheapest4: 384.36, expensive4: 629.35, avg: 510.37, czn: 454.9475, productionShare: 0.02016501091153217, consumptionSharePC: 0.14 },
+      { month: 'Luty', days: 28, cheapest4: 461.54, expensive4: 735.13, avg: 557.41, czn: 544.8605, productionShare: 0.04327469158701816, consumptionSharePC: 0.13 },
+      { month: 'Marzec', days: 31, cheapest4: 196.8, expensive4: 643.08, avg: 408.38, czn: 466.618, productionShare: 0.09112760444425545, consumptionSharePC: 0.11 },
+      { month: 'Kwiecień', days: 30, cheapest4: 142.87, expensive4: 606.91, avg: 386.09, czn: 435.8735, productionShare: 0.09791641889293141, consumptionSharePC: 0.08 },
+      { month: 'Maj', days: 31, cheapest4: 197.52, expensive4: 683.2, avg: 500.72, czn: 500.72, productionShare: 0.13201581412708166, consumptionSharePC: 0.05 },
+      { month: 'Czerwiec', days: 30, cheapest4: 79.65, expensive4: 777.18, avg: 580.603, czn: 580.603, productionShare: 0.13999992861247956, consumptionSharePC: 0.03 },
+      { month: 'Lipiec', days: 31, cheapest4: 293.02, expensive4: 699.54, avg: 514.609, czn: 514.609, productionShare: 0.13999992861247956, consumptionSharePC: 0.03 },
+      { month: 'Sierpień', days: 31, cheapest4: 177.94, expensive4: 641.89, avg: 465.6065, czn: 465.6065, productionShare: 0.13201581412708166, consumptionSharePC: 0.03 },
+      { month: 'Wrzesień', days: 30, cheapest4: 263.08, expensive4: 842.14, avg: 635.819, czn: 635.819, productionShare: 0.09791641889293141, consumptionSharePC: 0.04 },
+      { month: 'Październik', days: 31, cheapest4: 329.4, expensive4: 723.71, avg: 488.4, czn: 535.1535, productionShare: 0.04327469158701816, consumptionSharePC: 0.08 },
+      { month: 'Listopad', days: 30, cheapest4: 389.29, expensive4: 887.12, avg: 589.33, czn: 674.052, productionShare: 0.03186378593053011, consumptionSharePC: 0.13 },
+      { month: 'Grudzień', days: 31, cheapest4: 332.47, expensive4: 648.47, avg: 500.73, czn: 471.1995, productionShare: 0.01584695762663244, consumptionSharePC: 0.15 },
+    ];
+
+    function getInputs() {
+      const pvPower = parseFloat(document.getElementById('pvPower').value) || 0;
+      const roofDirection = document.getElementById('roofDirection').value;
+      // Oblicz produkcję na podstawie mocy PV i kierunku dachu - formuła z Excela: IF(B8="południe",B7*1050,B7*900)
+      // Jeśli "południe": 1050 kWh/kWp, w przeciwnym razie (wschód-zachód): 900 kWh/kWp
+      const production = roofDirection === 'południe' ? pvPower * 1050 : pvPower * 900;
+      
+      return {
+        heatingType: document.getElementById('heatingType').value,
+        consumption: parseFloat(document.getElementById('consumption').value) || 0,
+        pvPower: pvPower,
+        roofDirection: roofDirection,
+        production: production,
+        meCapacity: parseFloat(document.getElementById('meCapacity').value) || 0
+      };
+    }
+
+    function calculateMonthlyData() {
+      const inputs = getInputs();
+      const results = [];
+
+      priceData.forEach((monthData) => {
+        // Udział zużycia - formuła z Excela: IF($B$5="bez PC",($B$6/365*J5)/$B$6,I5)
+        // Jeśli "bez PC": (zużycie/365*dni)/zużycie = dni/365
+        // Jeśli "z PC": wartość z kolumny I (consumptionSharePC)
+        const consumptionShare = inputs.heatingType === 'bez PC' 
+          ? monthData.days / 365 
+          : monthData.consumptionSharePC;
+
+        // Produkcja miesięczna
+        const monthlyProduction = monthData.productionShare * inputs.production;
+        
+        // Produkcja dzienna
+        const dailyProduction = monthlyProduction / monthData.days;
+        
+        // Zużycie miesięczne
+        const monthlyConsumption = inputs.consumption * consumptionShare;
+        
+        // Średnie zużycie dzienne
+        const avgDailyConsumption = monthlyConsumption / monthData.days;
+        
+        // Saldo energii miesięcznie
+        const monthlyBalance = monthlyProduction - monthlyConsumption;
+        
+        // Średnia dzienna nadwyżka energii (ograniczona do pojemności ME)
+        const dailySurplus = monthlyBalance / monthData.days > 0 
+          ? Math.min(monthlyBalance / monthData.days, inputs.meCapacity) 
+          : 0;
+        
+        // Średni dzienny brak energii
+        const dailyDeficit = monthlyBalance / monthData.days < 0 
+          ? Math.abs(monthlyBalance / monthData.days) 
+          : 0;
+
+        // Cena odkupu (CZN) - formuła z Excela: X5*0.85-80
+        const cznPrice = monthData.expensive4 * 0.85 - 80;
+        
+        // Wartość depozytu netto (odsprzedaż)
+        const depositValue = dailySurplus > 0 
+          ? dailySurplus * monthData.days * cznPrice / 1000 
+          : 0;
+
+        // CSN (cena zakupu) - formuła z Excela: W5*1.05+29+5+132
+        const csnPrice = monthData.cheapest4 * 1.05 + 29 + 5 + 132;
+        
+        // Wartość zakupu energii netto
+        const purchaseValue = dailyDeficit > 0 
+          ? dailyDeficit * monthData.days * csnPrice / 1000 
+          : 0;
+
+        // Koszty dystrybucji netto - formuła z Excela: IF(T5="",(16.01+4.56+10.34+0.33),(16.01+4.56+10.34+0.33)+$B$13*(-T5)*J5)
+        // B13 = 0.11 (współczynnik kosztów dystrybucji)
+        const distributionCosts = dailyDeficit > 0
+          ? (16.01 + 4.56 + 10.34 + 0.33) + (0.11 * dailyDeficit * monthData.days)
+          : (16.01 + 4.56 + 10.34 + 0.33);
+
+        results.push({
+          ...monthData,
+          consumptionShare,
+          monthlyProduction,
+          dailyProduction,
+          monthlyConsumption,
+          avgDailyConsumption,
+          monthlyBalance,
+          dailySurplus,
+          dailyDeficit,
+          cznPrice,
+          depositValue,
+          csnPrice,
+          purchaseValue,
+          distributionCosts,
+          netValue: depositValue - purchaseValue - distributionCosts
+        });
+      });
+
+      return results;
+    }
+
+    function formatNumber(num) {
+      return num.toFixed(2);
+    }
+
+    function updateTable() {
+      const results = calculateMonthlyData();
+      const tbody = document.getElementById('resultsBody');
+      tbody.innerHTML = '';
+
+      results.forEach((month) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${month.month}</td>
+          <td>${month.days}</td>
+          <td>${formatNumber(month.monthlyProduction)}</td>
+          <td>${formatNumber(month.dailyProduction)}</td>
+          <td>${formatNumber(month.monthlyConsumption)}</td>
+          <td>${formatNumber(month.avgDailyConsumption)}</td>
+          <td class="${month.monthlyBalance >= 0 ? 'positive' : 'negative'}">${formatNumber(month.monthlyBalance)}</td>
+          <td>${formatNumber(month.dailySurplus)}</td>
+          <td>${formatNumber(month.dailyDeficit)}</td>
+          <td class="positive">${formatNumber(month.depositValue)}</td>
+          <td class="negative">${formatNumber(month.purchaseValue)}</td>
+          <td class="negative">${formatNumber(month.distributionCosts)}</td>
+          <td class="${month.netValue >= 0 ? 'positive' : 'negative'}">${formatNumber(month.netValue)}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function updateSummary() {
+      const results = calculateMonthlyData();
+      const summary = {
+        totalDeposit: results.reduce((sum, m) => sum + m.depositValue, 0),
+        totalPurchase: results.reduce((sum, m) => sum + m.purchaseValue, 0),
+        totalDistribution: results.reduce((sum, m) => sum + m.distributionCosts, 0),
+        totalNet: results.reduce((sum, m) => sum + m.netValue, 0),
+        avgMonthly: results.reduce((sum, m) => sum + m.netValue, 0) / 12
+      };
+
+      const gridMain = document.getElementById('summaryGridMain');
+      const isYearlyPositive = summary.totalNet >= 0;
+      const isMonthlyPositive = summary.avgMonthly >= 0;
+      
+      gridMain.innerHTML = `
+        <div class="summary-card-main ${isYearlyPositive ? 'positive' : 'negative'}">
+          <h3>Saldo roczne</h3>
+          <div class="label">${isYearlyPositive ? 'Rachunek 0 zł' : 'Dopłata'}</div>
+          <p class="${isYearlyPositive ? 'positive' : 'negative'} large">${formatNumber(Math.abs(summary.totalNet))} zł</p>
+        </div>
+        <div class="summary-card-main ${isMonthlyPositive ? 'positive' : 'negative'}">
+          <h3>Saldo miesięczne</h3>
+          <div class="label">${isMonthlyPositive ? 'Rachunek 0 zł' : 'Dopłata'}</div>
+          <p class="${isMonthlyPositive ? 'positive' : 'negative'} large">${formatNumber(Math.abs(summary.avgMonthly))} zł</p>
+        </div>
+      `;
+
+      const grid = document.getElementById('summaryGrid');
+      grid.innerHTML = `
+        <div class="summary-card">
+          <h3>Sprzedaż nadwyżek do sieci</h3>
+          <p class="positive large">${formatNumber(summary.totalDeposit)} zł</p>
+        </div>
+        <div class="summary-card">
+          <h3>Zakup energii z sieci</h3>
+          <p class="negative large">${formatNumber(summary.totalPurchase)} zł</p>
+        </div>
+        <div class="summary-card">
+          <h3>Koszty dystrybucji</h3>
+          <p class="negative large">${formatNumber(summary.totalDistribution)} zł</p>
+        </div>
+      `;
+    }
+
+    function updateAll() {
+      updateTable();
+      updateSummary();
+    }
+
+    // Aktualizuj produkcję przy zmianie mocy PV lub kierunku dachu
+    function updateProduction() {
+      const inputs = getInputs();
+      document.getElementById('production').value = inputs.production;
+    }
+
+    document.getElementById('pvPower').addEventListener('input', updateProduction);
+    document.getElementById('roofDirection').addEventListener('change', updateProduction);
+
+    // Event listener tylko dla przycisku "Przelicz"
+    document.getElementById('calculateBtn').addEventListener('click', updateAll);
+
+    // Initial calculation przy załadowaniu strony
+    updateProduction();
+    updateAll();
+  </script>
+</body>
+</html>

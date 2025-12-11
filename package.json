@@ -1,0 +1,25 @@
+{
+  "name": "sales-commission-tracker",
+  "version": "1.0.0",
+  "description": "Aplikacja do śledzenia umów i prowizji dla handlowców",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && nodemon index.js",
+    "client": "cd client && npm start",
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": [
+    "sales",
+    "commission",
+    "tracker"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.2",
+    "xlsx": "^0.18.5",
+    "serverless-http": "^3.2.0"
+  }
+}
