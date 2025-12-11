@@ -38,7 +38,8 @@ function ChangePassword({ adminEmail, onPasswordChanged }) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/admin/change-password', {
+      const apiUrl = process.env.REACT_APP_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/admin/change-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
