@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sales-commission-tracker-v1';
+const CACHE_NAME = 'sales-commission-tracker-v2';
 const urlsToCache = [
   '/',
   '/static/css/main.css',
@@ -14,10 +14,20 @@ self.addEventListener('install', (event) => {
         return cache.addAll(urlsToCache);
       })
   );
+  self.skipWaiting(); // Wymuś aktywację nowego service workera
 });
 
-// Fetch - próba pobrania z cache, jeśli nie ma - z sieci
+// Fetch - NIE cache'uj requestów API
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  
+  // NIE cache'uj requestów API - zawsze pobieraj z sieci
+  if (url.pathname.startsWith('/api/') || url.hostname.includes('onrender.com')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+  
+  // Dla innych requestów - cache strategy
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -62,6 +72,7 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+  return self.clients.claim(); // Wymuś kontrolę nad wszystkimi klientami
 });
 
 
