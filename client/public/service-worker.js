@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sales-commission-tracker-v2';
+const CACHE_NAME = 'sales-commission-tracker-v3';
 const urlsToCache = [
   '/',
   '/static/css/main.css',
@@ -7,14 +7,18 @@ const urlsToCache = [
 
 // Instalacja service workera
 self.addEventListener('install', (event) => {
+  console.log('Service Worker: Installing...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Opened cache');
+        console.log('Service Worker: Cache opened');
         return cache.addAll(urlsToCache);
       })
+      .then(() => {
+        console.log('Service Worker: Installed');
+        return self.skipWaiting(); // Wymuś aktywację natychmiast
+      })
   );
-  self.skipWaiting(); // Wymuś aktywację nowego service workera
 });
 
 // Fetch - NIE cache'uj requestów API
@@ -58,21 +62,26 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Aktywacja - usuń stare cache
+// Aktywacja - usuń stare cache i wymuś kontrolę
 self.addEventListener('activate', (event) => {
+  console.log('Service Worker: Activating...');
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('Service Worker: Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     })
+    .then(() => {
+      console.log('Service Worker: Activated');
+      return self.clients.claim(); // Wymuś kontrolę nad wszystkimi klientami
+    })
   );
-  return self.clients.claim(); // Wymuś kontrolę nad wszystkimi klientami
 });
 
 

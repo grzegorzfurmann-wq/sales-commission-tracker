@@ -13,16 +13,41 @@ function App() {
   useEffect(() => {
     fetchSalespeople();
     
-    // Rejestracja Service Workera dla PWA
+    // Rejestracja Service Workera dla PWA z automatyczną aktualizacją
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/service-worker.js')
           .then((registration) => {
             console.log('Service Worker zarejestrowany:', registration.scope);
+            
+            // Sprawdź czy jest nowa wersja Service Workera
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // Nowa wersja dostępna - odśwież stronę automatycznie
+                    console.log('Nowa wersja Service Workera dostępna - odświeżanie...');
+                    window.location.reload();
+                  }
+                });
+              }
+            });
+            
+            // Sprawdź aktualizacje co godzinę
+            setInterval(() => {
+              registration.update();
+            }, 60 * 60 * 1000);
           })
           .catch((error) => {
             console.log('Błąd rejestracji Service Workera:', error);
           });
+      });
+      
+      // Nasłuchuj na komunikaty z Service Workera
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        console.log('Service Worker zmieniony - odświeżanie...');
+        window.location.reload();
       });
     }
   }, []);
