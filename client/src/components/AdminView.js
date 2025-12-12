@@ -6,6 +6,7 @@ import ChangePassword from './ChangePassword';
 import SalespeopleManagement from './SalespeopleManagement';
 import AdminDashboard from './AdminDashboard';
 import AdminCommissionStats from './AdminCommissionStats';
+import SalespersonRanking from './SalespersonRanking';
 
 function AdminView({ formatCurrency, adminEmail }) {
   const [salespeople, setSalespeople] = useState([]);
@@ -78,6 +79,10 @@ function AdminView({ formatCurrency, adminEmail }) {
 
       <AdminCommissionStats
         contracts={contracts}
+        formatCurrency={formatCurrency}
+      />
+
+      <SalespersonRanking
         formatCurrency={formatCurrency}
       />
 

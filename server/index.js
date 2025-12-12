@@ -1329,6 +1329,54 @@ app.delete('/api/contracts/:id', (req, res) => {
   });
 });
 
+// Ranking handlowców - umowy "do wypłaty" w perspektywie miesięcznej
+app.get('/api/ranking', (req, res) => {
+  const { month, year } = req.query;
+  
+  // Jeśli nie podano miesiąca/roku, użyj bieżącego miesiąca
+  const now = new Date();
+  const targetMonth = month ? parseInt(month) : now.getMonth() + 1; // 1-12
+  const targetYear = year ? parseInt(year) : now.getFullYear();
+  
+  // Oblicz zakres dat dla danego miesiąca
+  const startDate = `${targetYear}-${String(targetMonth).padStart(2, '0')}-01`;
+  const endDate = new Date(targetYear, targetMonth, 0).toISOString().split('T')[0]; // Ostatni dzień miesiąca
+  
+  // Pobierz handlowców z umowami "paid" (do wypłaty) w danym miesiącu
+  // Tylko osoby z co najmniej jedną umową "paid"
+  db.all(
+    `SELECT 
+      s.id,
+      s.name,
+      s.email,
+      COUNT(c.id) as contracts_count,
+      SUM(c.contract_value) as total_value,
+      SUM(c.contract_value * COALESCE(c.commission_rate, s.commission_rate)) as total_commission
+    FROM salespeople s
+    INNER JOIN contracts c ON s.id = c.salesperson_id
+    WHERE c.status = 'paid'
+      AND DATE(c.paid_date) >= ?
+      AND DATE(c.paid_date) <= ?
+    GROUP BY s.id, s.name, s.email
+    HAVING COUNT(c.id) > 0
+    ORDER BY contracts_count DESC, total_commission DESC`,
+    [startDate, endDate],
+    (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({
+        month: targetMonth,
+        year: targetYear,
+        startDate: startDate,
+        endDate: endDate,
+        ranking: rows
+      });
+    }
+  );
+});
+
 // Weryfikuj token do ustawienia hasła
 app.get('/api/set-password/:token', (req, res) => {
   const { token } = req.params;
