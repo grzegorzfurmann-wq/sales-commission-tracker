@@ -1489,6 +1489,49 @@ app.post('/api/set-password', async (req, res) => {
   );
 });
 
+// Ustaw hasło dla handlowca przez admina (bez tokenu)
+app.post('/api/admin/set-salesperson-password', async (req, res) => {
+  const { salesperson_id, password } = req.body;
+  
+  if (!salesperson_id || !password) {
+    res.status(400).json({ error: 'ID handlowca i hasło są wymagane' });
+    return;
+  }
+  
+  if (password.length < 6) {
+    res.status(400).json({ error: 'Hasło musi mieć co najmniej 6 znaków' });
+    return;
+  }
+  
+  try {
+    // Hashuj hasło
+    const hash = await bcrypt.hash(password, 10);
+    
+    // Zaktualizuj hasło handlowca
+    db.run(
+      "UPDATE salespeople SET password_hash = ? WHERE id = ?",
+      [hash, salesperson_id],
+      function(updateErr) {
+        if (updateErr) {
+          res.status(500).json({ error: updateErr.message });
+          return;
+        }
+        
+        if (this.changes === 0) {
+          res.status(404).json({ error: 'Handlowiec nie znaleziony' });
+          return;
+        }
+        
+        res.json({ 
+          message: 'Hasło zostało ustawione pomyślnie.' 
+        });
+      }
+    );
+  } catch (error) {
+    res.status(500).json({ error: 'Błąd podczas ustawiania hasła' });
+  }
+});
+
 // Start serwera (tylko jeśli nie jesteśmy w środowisku Netlify)
 if (process.env.NETLIFY !== 'true') {
   app.listen(PORT, () => {
