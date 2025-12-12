@@ -1344,6 +1344,7 @@ app.get('/api/ranking', (req, res) => {
   
   // Pobierz handlowców z umowami "paid" (do wypłaty) w danym miesiącu
   // Tylko osoby z co najmniej jedną umową "paid"
+  // Używamy COALESCE aby użyć paid_date jeśli istnieje, w przeciwnym razie signed_date
   db.all(
     `SELECT 
       s.id,
@@ -1355,8 +1356,8 @@ app.get('/api/ranking', (req, res) => {
     FROM salespeople s
     INNER JOIN contracts c ON s.id = c.salesperson_id
     WHERE c.status = 'paid'
-      AND DATE(c.paid_date) >= ?
-      AND DATE(c.paid_date) <= ?
+      AND DATE(COALESCE(c.paid_date, c.signed_date, c.created_at)) >= ?
+      AND DATE(COALESCE(c.paid_date, c.signed_date, c.created_at)) <= ?
     GROUP BY s.id, s.name, s.email
     HAVING COUNT(c.id) > 0
     ORDER BY contracts_count DESC, total_commission DESC`,

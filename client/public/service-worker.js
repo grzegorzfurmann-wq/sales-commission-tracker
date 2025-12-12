@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sales-commission-tracker-v3';
+const CACHE_NAME = 'sales-commission-tracker-v4';
 const urlsToCache = [
   '/',
   '/static/css/main.css',
