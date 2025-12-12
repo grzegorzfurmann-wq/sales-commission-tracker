@@ -13,6 +13,9 @@ function SalespeopleManagement({ salespeople, onSalespersonAdded, onSalespersonU
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [settingPasswordFor, setSettingPasswordFor] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [isSettingPassword, setIsSettingPassword] = useState(false);
 
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
@@ -29,9 +32,10 @@ function SalespeopleManagement({ salespeople, onSalespersonAdded, onSalespersonU
     setIsSubmitting(true);
 
     try {
+      const apiUrl = process.env.REACT_APP_API_URL || '';
       const url = editingId 
-        ? `/api/salespeople/${editingId}`
-        : '/api/salespeople';
+        ? `${apiUrl}/api/salespeople/${editingId}`
+        : `${apiUrl}/api/salespeople`;
       
       const method = editingId ? 'PUT' : 'POST';
 
@@ -111,6 +115,42 @@ function SalespeopleManagement({ salespeople, onSalespersonAdded, onSalespersonU
     setShowForm(false);
     setEditingId(null);
     setError('');
+  };
+
+  const handleSetPassword = async (salespersonId) => {
+    if (!newPassword || newPassword.length < 6) {
+      alert('Hasło musi mieć co najmniej 6 znaków');
+      return;
+    }
+
+    setIsSettingPassword(true);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/admin/set-salesperson-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          salesperson_id: salespersonId,
+          password: newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Hasło zostało ustawione pomyślnie!');
+        setSettingPasswordFor(null);
+        setNewPassword('');
+      } else {
+        alert(data.error || 'Błąd podczas ustawiania hasła');
+      }
+    } catch (error) {
+      alert('Błąd połączenia z serwerem');
+    } finally {
+      setIsSettingPassword(false);
+    }
   };
 
   return (
@@ -278,12 +318,46 @@ function SalespeopleManagement({ salespeople, onSalespersonAdded, onSalespersonU
                     Edytuj
                   </button>
                   <button
+                    className="btn-set-password"
+                    onClick={() => setSettingPasswordFor(person.id)}
+                    style={{ backgroundColor: '#28a745', color: 'white' }}
+                  >
+                    Ustaw Hasło
+                  </button>
+                  <button
                     className="btn-delete"
                     onClick={() => handleDelete(person.id, person.name)}
                   >
                     Usuń
                   </button>
                 </div>
+                {settingPasswordFor === person.id && (
+                  <div className="set-password-form" style={{ marginTop: '1rem', padding: '1rem', background: '#f8f9fa', borderRadius: '6px' }}>
+                    <input
+                      type="password"
+                      placeholder="Nowe hasło (min. 6 znaków)"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      style={{ padding: '0.5rem', marginRight: '0.5rem', borderRadius: '4px', border: '1px solid #ddd' }}
+                    />
+                    <button
+                      onClick={() => handleSetPassword(person.id)}
+                      disabled={isSettingPassword || !newPassword || newPassword.length < 6}
+                      style={{ padding: '0.5rem 1rem', backgroundColor: '#667eea', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                      {isSettingPassword ? 'Zapisywanie...' : 'Zapisz'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSettingPasswordFor(null);
+                        setNewPassword('');
+                      }}
+                      style={{ padding: '0.5rem 1rem', marginLeft: '0.5rem', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                      Anuluj
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
